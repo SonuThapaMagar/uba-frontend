@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import bg from '../assets/bg.png';
+import { Link } from 'react-router-dom';
+import bg from '../../assets/bg.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -90,9 +91,9 @@ const Login = () => {
 
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
-              <a href="#" className="font-medium text-indigo-400 hover:text-indigo-500">
+              <Link to="/signup" className="font-medium text-indigo-400 hover:text-indigo-500">
                 create a new account
-              </a>
+              </Link>
             </p>
           </div>
         </form>
