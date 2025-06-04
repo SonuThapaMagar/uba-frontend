@@ -1,15 +1,41 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import bg from '../../assets/bg.png';
+import { users } from '../../types/userdata';
+import type { User } from '../../types/User';
 
 const Signup = () => {
     const [fname, setFname] = useState('');
     const [lname, setLname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Signup attempt with:', { fname, lname, email, password });
+        
+        // Check if email already exists
+        if (users.some(user => user.email === email)) {
+            setError('Email already registered');
+            return;
+        }
+
+        // Create new user
+        const newUser: User = {
+            id: users.length + 1,
+            fname,
+            lname,
+            email,
+            password
+        };
+
+        // Add to users array
+        users.push(newUser);
+        console.log('User registered:', newUser);
+        
+        // Redirect to login
+        navigate('/');
     };
 
     return (
@@ -26,6 +52,7 @@ const Signup = () => {
                         Register
                     </h2>
                 </div>
+                {error && <div className="text-red-500 text-sm text-center">{error}</div>}
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="space-y-4">
                         <div>
