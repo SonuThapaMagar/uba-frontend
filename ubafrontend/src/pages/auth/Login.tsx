@@ -2,11 +2,26 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import bg from '../../assets/bg.png';
 import { users } from '../../types/userdata';
+import InputField from '../../components/common/InputField';
+import { useForm } from '../../hooks/useForm';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { formData, handleChange } = useForm({
+    email: '',
+    password: ''
+  });
   const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = onLogin(formData.email, formData.password);
+    if (!result.success) {
+      setError(result.message || 'Login failed');
+    } else {
+      setError('');
+      alert('Login successful!');
+    }
+  };
 
   const onLogin = (email: string, password: string) => {
     const user = users.find(u => u.email === email && u.password === password);
@@ -14,17 +29,6 @@ const Login = () => {
       return { success: true };
     }
     return { success: false, message: 'Invalid email or password' };
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = onLogin(email, password);
-    if (!result.success) {
-      setError(result.message || 'Login failed');
-    } else {
-      setError('');
-      alert('Login successful!');
-    }
   };
 
   return (
@@ -41,42 +45,30 @@ const Login = () => {
             Login
           </h2>
         </div>
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+            <InputField
+              label="Email address"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              required
+              autoComplete="email"
+              data-testid="email"
+            />
+            <InputField
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+              data-testid="password"
+            />
           </div>
 
           <div className="flex items-center justify-between">
@@ -101,7 +93,7 @@ const Login = () => {
 
           <div>
             <button
-              type="submit" onClick={handleSubmit}
+              type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F69FB] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Login
@@ -109,7 +101,7 @@ const Login = () => {
 
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
-              <Link to="/signup" className="font-medium text-indigo-400 hover:text-indigo-500">
+              <Link to="/signup" className="font-medium text-indigo-400 hover:text-indigo-500 ml-1">
                 create a new account
               </Link>
             </p>

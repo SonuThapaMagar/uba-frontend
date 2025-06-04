@@ -2,39 +2,38 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import bg from '../../assets/bg.png';
 import { users } from '../../types/userdata';
+import InputField from '../../components/common/InputField';
+import { useForm } from '../../hooks/useForm';
 import type { User } from '../../types/User';
 
 const Signup = () => {
-    const [fname, setFname] = useState('');
-    const [lname, setLname] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const { formData, handleChange } = useForm({
+        fname: '',
+        lname: '',
+        email: '',
+        password: ''
+    });
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // Check if email already exists
-        if (users.some(user => user.email === email)) {
+        if (users.some(user => user.email === formData.email)) {
             setError('Email already registered');
             return;
         }
 
-        // Create new user
         const newUser: User = {
             id: users.length + 1,
-            fname,
-            lname,
-            email,
-            password
+            fname: formData.fname,
+            lname: formData.lname,
+            email: formData.email,
+            password: formData.password
         };
 
-        // Add to users array
         users.push(newUser);
         console.log('User registered:', newUser);
-        
-        // Redirect to login
         navigate('/');
     };
 
@@ -55,68 +54,44 @@ const Signup = () => {
                 {error && <div className="text-red-500 text-sm text-center">{error}</div>}
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="space-y-4">
-                        <div>
-                            <label htmlFor="fname" className="block text-sm font-medium text-gray-700 mb-1">
-                                First Name
-                            </label>
-                            <input
-                                id="fname"
-                                name="fname"
-                                type="text"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Enter your first name"
-                                value={fname}
-                                onChange={(e) => setFname(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="lname" className="block text-sm font-medium text-gray-700 mb-1">
-                                Last Name
-                            </label>
-                            <input
-                                id="lname"
-                                name="lname"
-                                type="text"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Enter your last name"
-                                value={lname}
-                                onChange={(e) => setLname(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="new-password"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
+                        <InputField
+                            label="First Name"
+                            type="text"
+                            value={formData.fname}
+                            onChange={handleChange}
+                            placeholder="Enter your first name"
+                            required
+                            data-testid="first name"
+                        />
+                        <InputField
+                            label="Last Name"
+                            type="text"
+                            value={formData.lname}
+                            onChange={handleChange}
+                            placeholder="Enter your last name"
+                            required
+                            data-testid="last name"
+                        />
+                        <InputField
+                            label="Email address"
+                            type="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            required
+                            autoComplete="email"
+                            data-testid="email address"
+                        />
+                        <InputField
+                            label="Password"
+                            type="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder="Enter your password"
+                            required
+                            autoComplete="new-password"
+                            data-testid="password"
+                        />
                     </div>
 
                     <div>
@@ -128,7 +103,7 @@ const Signup = () => {
                         </button>
                         <p className="mt-2 text-center text-sm text-gray-600">
                             Already have an account?{' '}
-                            <a href="/" className="font-medium text-indigo-400 hover:text-indigo-500">
+                            <a href="/" className="font-medium text-indigo-400 hover:text-indigo-500 ml-1">
                                 Login
                             </a>
                         </p>
