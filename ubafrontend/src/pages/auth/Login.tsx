@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import bg from '../../assets/bg.png';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { users } from '../../types/userdata';
 import InputField from '../../components/common/InputField';
 import { useForm } from '../../hooks/useForm';
+import { showToast } from '../../utils/toast';
+import bg from '../../assets/bg.png'
 
 const Login = () => {
   const { formData, handleChange } = useForm({
@@ -11,15 +12,18 @@ const Login = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const result = onLogin(formData.email, formData.password);
     if (!result.success) {
       setError(result.message || 'Login failed');
+      showToast.error(result.message || 'Login failed');
     } else {
       setError('');
-      alert('Login successful!');
+      showToast.success('Login successful!');
+      navigate('/dashboard');
     }
   };
 
@@ -38,7 +42,6 @@ const Login = () => {
         alt="background"
         className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none select-none opacity-100"
       />
-
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg relative z-20">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
@@ -58,6 +61,7 @@ const Login = () => {
               required
               autoComplete="email"
               data-testid="email"
+              name="email"
             />
             <InputField
               label="Password"
@@ -68,6 +72,7 @@ const Login = () => {
               required
               autoComplete="current-password"
               data-testid="password"
+              name="password"
             />
           </div>
 

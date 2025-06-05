@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import bg from '../../assets/bg.png';
 import { users } from '../../types/userdata';
 import InputField from '../../components/common/InputField';
 import { useForm } from '../../hooks/useForm';
@@ -39,12 +38,6 @@ const Signup = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <img
-                src={bg}
-                alt="background"
-                className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none select-none"
-            />
-
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg relative z-20">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
@@ -62,6 +55,7 @@ const Signup = () => {
                             placeholder="Enter your first name"
                             required
                             data-testid="first name"
+                            name="fname"
                         />
                         <InputField
                             label="Last Name"
@@ -71,6 +65,7 @@ const Signup = () => {
                             placeholder="Enter your last name"
                             required
                             data-testid="last name"
+                            name="lname"
                         />
                         <InputField
                             label="Email address"
@@ -81,6 +76,7 @@ const Signup = () => {
                             required
                             autoComplete="email"
                             data-testid="email address"
+                            name="email"
                         />
                         <InputField
                             label="Password"
@@ -91,6 +87,7 @@ const Signup = () => {
                             required
                             autoComplete="new-password"
                             data-testid="password"
+                            name="password"
                         />
                     </div>
 
