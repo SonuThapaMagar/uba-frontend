@@ -1,49 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client";
 import DashboardLayout from "../../layouts/dashboardLayout";
 import { showToast } from "../../utils/toast";
 import { TOAST_MESSAGES } from "../../constants/constant";
+import { graphQLRequest } from "../../utils/api";
 import { GET_USERS, DELETE_USER } from "../../utils/queries";
 
 const DeleteUser = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(true);
 
-  const { data: usersData } = useQuery(GET_USERS, {
-    fetchPolicy: 'network-only'
-  });
-
-  const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: () => {
-      showToast.success(TOAST_MESSAGES.USER_DELETED);
-      navigate("/users");
-    },
-    onError: (error) => {
-      showToast.error(TOAST_MESSAGES.USER_DELETE_ERROR);
-      console.error('Error deleting user:', error);
-    }
-  });
-
   useEffect(() => {
-    if (usersData?.users) {
-      const foundUser = usersData.users.find((u: any) => u.id === id);
-      if (foundUser) {
-        setUser(foundUser);
-      } else {
-        showToast.error(TOAST_MESSAGES.USER_NOT_FOUND);
-        navigate("/users");
+    const fetchUser = async () => {
+      try {
+        const response = await graphQLRequest(GET_USERS);
+        if (response?.users) {
+          const foundUser = response.users.find((u: any) => u.id === id);
+          if (foundUser) {
+            setUser(foundUser);
+          } else {
+            showToast.error(TOAST_MESSAGES.USER_NOT_FOUND);
+            navigate("/users");
+          }
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+        showToast.error(TOAST_MESSAGES.USER_UPDATE_ERROR);
       }
-    }
-  }, [id, navigate, usersData]);
+    };
+    fetchUser();
+  }, [id, navigate]);
 
   const handleDelete = async () => {
     try {
-      await deleteUser({ variables: { id } });
+      await graphQLRequest(DELETE_USER, { id });
+      showToast.success(TOAST_MESSAGES.USER_DELETED);
+      navigate("/users");
     } catch (err) {
-      console.error('Error in handleDelete:', err);
+      setError(err instanceof Error ? err.message : String(err));
+      showToast.error(TOAST_MESSAGES.USER_DELETE_ERROR);
     }
   };
 

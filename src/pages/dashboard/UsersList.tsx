@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_USERS, DELETE_USER } from '../../utils/queries';
+import { useQuery } from '@apollo/client';
+import { GET_USERS } from '../../utils/queries';
 import { Link } from 'react-router-dom';
 import DashboardLayout from '../../layouts/dashboardLayout';
 import { showToast } from '../../utils/toast';
@@ -17,20 +17,7 @@ const USERS_PER_PAGE = 5;
 
 const UsersList: React.FC = () => {
   const { loading, error, data, refetch } = useQuery(GET_USERS, {
-    // ensures always get fresh data
-    fetchPolicy: 'network-only' 
-  });
-  
-  const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: () => {
-      showToast.success(TOAST_MESSAGES.USER_DELETED);
-      // Refetch after deletion
-      refetch(); 
-    },
-    onError: (error) => {
-      showToast.error(TOAST_MESSAGES.USER_DELETE_ERROR);
-      console.error('Error deleting user:', error);
-    }
+    fetchPolicy: 'network-only' // Always fetch fresh data
   });
 
   // State for search, sort, filter, and pagination
@@ -97,6 +84,7 @@ const UsersList: React.FC = () => {
     setPage(1);
   };
 
+  const users: User[] = data?.users || [];
   const handlePrevPage = () => setPage((p) => Math.max(1, p - 1));
   const handleNextPage = () => setPage((p) => Math.min(totalPages, p + 1));
 
@@ -105,14 +93,14 @@ const UsersList: React.FC = () => {
       <div className="p-4">Loading...</div>
     </DashboardLayout>
   );
-  
+
   if (error) return (
     <DashboardLayout>
       <div className="p-4 text-red-500">Error: {error.message}</div>
     </DashboardLayout>
   );
 
-  console.log('Users data:', data); 
+  console.log('Users data:', data);
 
   return (
     <DashboardLayout>
