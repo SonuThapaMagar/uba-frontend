@@ -34,8 +34,8 @@ export class UserResolver {
         return userRepository.save(user);
     }
 
-    @Mutation(() => User)
-    async deleteUser(@Arg('id') id: string): Promise<User> {
+    @Mutation(() => String)
+    async deleteUser(@Arg('id') id: string): Promise<string> {
         const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOneBy({ id });
         
@@ -44,6 +44,6 @@ export class UserResolver {
         }
 
         await userRepository.remove(user);
-        return user;
+        return id;
     }
 }
