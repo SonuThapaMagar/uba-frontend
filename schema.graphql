@@ -14,14 +14,11 @@ input LoginInput {
 }
 
 type Mutation {
-  deleteUser(id: String!): String!
   login(input: LoginInput!): AuthResponse!
   signup(input: SignupInput!): AuthResponse!
-  updateUser(id: String!, input: SignupInput!): User!
 }
 
 type Query {
-  user(id: String!): User
   users: [User!]!
 }
 
