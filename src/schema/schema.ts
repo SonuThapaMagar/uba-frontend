@@ -9,6 +9,5 @@ export const createSchema = async () => {
     emitSchemaFile: path.resolve(__dirname, '../../schema.graphql'),
     validate: false,
     authChecker: () => true,
-    orphanedTypes: [] 
   });
 };

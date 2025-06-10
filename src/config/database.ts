@@ -6,11 +6,11 @@ export const AppDataSource = new DataSource({
     host: "localhost",
     port: 3306,
     username: "root",
-    password: "", 
+    password: "",
     database: "uba",
-    synchronize: true, 
+    synchronize: true,
     logging: true,
     entities: [User],
     subscribers: [],
     migrations: [],
-}); 
+});
