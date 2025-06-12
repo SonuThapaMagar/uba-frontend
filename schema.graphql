@@ -14,11 +14,21 @@ input LoginInput {
 }
 
 type Mutation {
+  approveUser(id: String!): User!
+  createUser(input: SignupInput!): User!
+  declineUser(id: String!): String!
+  deleteUser(id: String!): String!
   login(input: LoginInput!): AuthResponse!
   signup(input: SignupInput!): AuthResponse!
+  updateProfile(input: SignupInput!): User!
+  updateUser(id: String!, input: SignupInput!): User!
 }
 
 type Query {
+  currentUser: User
+  signupRequests: [User!]!
+  testPassword(email: String!, password: String!): Boolean!
+  user(id: String!): User
   users: [User!]!
 }
 
@@ -26,12 +36,15 @@ input SignupInput {
   email: String!
   fname: String!
   lname: String!
-  password: String!
+  password: String
+  role: String
 }
 
 type User {
   email: String!
   fname: String!
-  id: ID!
+  id: String!
+  isVerified: Boolean!
   lname: String!
+  role: String!
 }
