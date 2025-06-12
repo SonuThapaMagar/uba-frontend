@@ -8,7 +8,7 @@ import { JWT_SECRET } from '../config/constants';
 
 @Resolver()
 export class UserResolver {
-    @Authorized(['SUPER_ADMIN', 'ADMIN'])
+    @Authorized(['SUPER_ADMIN', 'ADMIN','USER'])
     @Query(() => [User])
     async users(@Ctx() { req }: any): Promise<User[]> {
         return AppDataSource.getRepository(User).find();
