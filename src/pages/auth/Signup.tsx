@@ -1,13 +1,15 @@
+// frontend/src/pages/auth/Signup.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
 import InputField from '../../components/common/InputField';
 import { useForm } from '../../hooks/useForm';
 import { showToast } from '../../utils/toast';
 import { TOAST_MESSAGES } from '../../constants/constant';
-import { graphQLRequest } from '../../utils/api';
 import { SIGNUP } from '../../utils/queries';
 
 const Signup = () => {
+  const navigate = useNavigate();
   const { formData, handleChange } = useForm({
     fname: '',
     lname: '',
@@ -15,29 +17,21 @@ const Signup = () => {
     password: ''
   });
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+
+  const [signup, { loading }] = useMutation(SIGNUP, {
+    onCompleted: () => {
+      showToast.success('Sign up successful! Await admin approval.');
+      navigate('/');
+    },
+    onError: (err) => {
+      setError(err.message);
+      showToast.error(err.message || TOAST_MESSAGES.USER_CREATE_ERROR);
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: SIGNUP.loc?.source.body,
-          variables: { input: formData }
-        })
-      });
-      const result = await response.json();
-      if (result.errors) throw new Error(result.errors[0].message);
-      localStorage.setItem('token', result.data.signup.token);
-      showToast.success(TOAST_MESSAGES.USER_CREATED);
-      navigate('/');
-    } catch (err) {
-      if (err instanceof Error) setError(err.message);
-      else setError('An unknown error occurred');
-      showToast.error(TOAST_MESSAGES.USER_CREATE_ERROR);
-    }
+    signup({ variables: { input: formData } });
   };
 
   return (
@@ -47,15 +41,55 @@ const Signup = () => {
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <InputField label="First Name" type="text" value={formData.fname} onChange={handleChange} placeholder="Enter your first name" required name="fname" />
-            <InputField label="Last Name" type="text" value={formData.lname} onChange={handleChange} placeholder="Enter your last name" required name="lname" />
-            <InputField label="Email address" type="email" value={formData.email} onChange={handleChange} placeholder="Enter your email" required autoComplete="email" name="email" />
-            <InputField label="Password" type="password" value={formData.password} onChange={handleChange} placeholder="Enter your password" required autoComplete="new-password" name="password" />
+            <InputField
+              label="First Name"
+              type="text"
+              name="fname"
+              value={formData.fname}
+              onChange={handleChange}
+              placeholder="Enter your first name"
+              required
+            />
+            <InputField
+              label="Last Name"
+              type="text"
+              name="lname"
+              value={formData.lname}
+              onChange={handleChange}
+              placeholder="Enter your last name"
+              required
+            />
+            <InputField
+              label="Email address"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              required
+              autoComplete="email"
+            />
+            <InputField
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              required
+              autoComplete="new-password"
+            />
           </div>
-          <button type="submit" className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F69FB] hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Register
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F69FB] hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            {loading ? 'Registering...' : 'Register'}
           </button>
-          <p className="mt-2 text-center text-sm text-gray-600">Already have an account? <a href="/" className="font-medium text-indigo-400 hover:text-indigo-500 ml-1">Login</a></p>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Already have an account? <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">Login</a>
+          </p>
         </form>
       </div>
     </div>

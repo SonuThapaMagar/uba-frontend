@@ -13,7 +13,8 @@ const CreateUser = () => {
     fname: '',
     lname: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'USER'
   });
   const [error, setError] = useState('');
 
@@ -21,22 +22,16 @@ const CreateUser = () => {
     e.preventDefault();
     try {
       const response = await graphQLRequest(`
-        mutation Signup($input: SignupInput!) {
-          signup(input: $input) {
-            token
-            user {
-              id
-              email
-              fname
-              lname
-            }
+        mutation CreateUser($input: SignupInput!) {
+          createUser(input: $input) {
+            id
+            email
+            fname
+            lname
           }
         }
-      `, {
-        input: formData
-      });
-      
-      if (response?.signup?.user) {
+      `, { input: formData });
+      if (response?.createUser) {
         showToast.success(TOAST_MESSAGES.USER_CREATED);
         navigate('/users');
       } else {
@@ -59,58 +54,16 @@ const CreateUser = () => {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New User</h2>
           {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <InputField
-              label="First Name"
-              type="text"
-              value={formData.fname}
-              onChange={handleChange}
-              placeholder="Enter first name"
-              required
-              data-testid="firstname"
-              name="fname"
-            />
-            <InputField
-              label="Last Name"
-              type="text"
-              value={formData.lname}
-              onChange={handleChange}
-              placeholder="Enter last name"
-              required
-              data-testid="lastname"
-              name="lname"
-            />
-            <InputField
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter email"
-              required
-              data-testid="email"
-              name="email"
-            />
-            <InputField
-              label="Password"
-              type="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password"
-              required
-              data-testid="password"
-              name="password"
-            />
-            <button
-              type="submit"
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              data-testid="submit-button"
-            >
-              Create User
-            </button>
+            <InputField label="First Name" type="text" value={formData.fname} onChange={handleChange} placeholder="Enter first name" required name="fname" />
+            <InputField label="Last Name" type="text" value={formData.lname} onChange={handleChange} placeholder="Enter last name" required name="lname" />
+            <InputField label="Email" type="email" value={formData.email} onChange={handleChange} placeholder="Enter email" required name="email" />
+            <InputField label="Password" type="password" value={formData.password} onChange={handleChange} placeholder="Enter password" required name="password" />
+            <InputField label="Role" type="text" value={formData.role} onChange={handleChange} placeholder="Enter role (USER/ADMIN)" required name="role" />
+            <button type="submit" className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">Create User</button>
           </form>
         </div>
       </div>
     </DashboardLayout>
   );
 };
-
 export default CreateUser;

@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { DocumentNode } from '@apollo/client';
+import { getToken } from './auth';
 
 const API_URL = 'http://localhost:4000/graphql';
 
@@ -11,7 +12,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -21,17 +22,17 @@ api.interceptors.request.use((config) => {
 export const graphQLRequest = async (query: DocumentNode | string, variables?: any) => {
   try {
     const queryString = typeof query === 'string' ? query : query.loc?.source.body;
-    
+
     const response = await api.post('', {
       query: queryString,
-      variables: variables || {}
+      variables: variables || {},
     });
-    
+
     if (response.data.errors) {
       console.error('GraphQL Error:', response.data.errors);
       throw new Error(response.data.errors[0].message);
     }
-    
+
     return response.data.data;
   } catch (error) {
     if (error instanceof AxiosError) {

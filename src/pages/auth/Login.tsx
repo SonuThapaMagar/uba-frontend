@@ -1,46 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import InputField from '../../components/common/InputField';
 import { useForm } from '../../hooks/useForm';
 import { showToast } from '../../utils/toast';
 import { TOAST_MESSAGES } from '../../constants/constant';
 import bg from '../../assets/bg.png';
-import { graphQLRequest } from '../../utils/api';
+import { useMutation } from '@apollo/client';
 import { LOGIN } from '../../utils/queries';
+import { storeToken, getCurrentRole } from '../../utils/auth';
 
 const Login = () => {
   const { formData, handleChange } = useForm({
     email: '',
-    password: ''
+    password: '',
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [login, { loading }] = useMutation(LOGIN, {
+    onCompleted: (data) => {
+      if (data.login) {
+        const { token, user } = data.login;
+        if (!user.role) {
+          setError('User role not found');
+          return;
+        }
+        storeToken(token, user.role);
+        showToast.success(TOAST_MESSAGES.LOGIN_SUCCESS);
+        navigate('/dashboard', { replace: true });
+      }
+    },
+    onError: (error) => {
+      setError(error.message);
+      showToast.error(error.message || TOAST_MESSAGES.LOGIN_ERROR);
+    },
+  });
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const currentRole = getCurrentRole();
+    if (currentRole) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await graphQLRequest(LOGIN, {
-        input: {
-          email: formData.email,
-          password: formData.password
-        }
-      });
-      
-      if (response?.login?.token) {
-        localStorage.setItem('token', response.login.token);
-        showToast.success(TOAST_MESSAGES.LOGIN_SUCCESS);
-        navigate('/dashboard');
-      } else {
-        throw new Error('Invalid response from server');
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unexpected error occurred.');
-      }
-      showToast.error(TOAST_MESSAGES.LOGIN_ERROR);
-    }
+    setError('');
+    login({ variables: { input: formData } });
   };
 
   return (
@@ -52,9 +58,7 @@ const Login = () => {
       />
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg relative z-20">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
-            Login
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">Login</h2>
         </div>
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -103,9 +107,10 @@ const Login = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F69FB] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={loading}
+              className="flex w-full justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#5F69fb] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
             <p className="mt-2 text-center text-sm text-gray-600">
               Or{' '}
