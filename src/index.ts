@@ -6,6 +6,10 @@ import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcryptjs';
 import { User } from './entities/User';
 import { JWT_SECRET } from './config/constants';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 async function seedSuperAdmin() {
   const userRepository = AppDataSource.getRepository(User);
@@ -49,6 +53,7 @@ async function bootstrap() {
           }
         } catch (error) {
           console.error('Token verification failed:', error.message);
+          currentUser = null;
         }
       }
 
