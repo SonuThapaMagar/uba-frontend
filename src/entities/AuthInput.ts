@@ -1,25 +1,38 @@
-import { InputType, Field } from 'type-graphql';
+import { InputType, Field, ObjectType } from 'type-graphql';
+import { User } from './User';
 
-  @InputType()
-  export class LoginInput {
-    @Field()
-    email: string;
+@InputType()
+export class SignupInput {
+  @Field()
+  email: string;
 
-    @Field()
-    password: string;
-  }
+  @Field({ nullable: true })
+  password?: string;
 
-  @InputType()
-  export class SignupInput {
-    @Field()
-    email: string;
+  @Field()
+  fname: string;
 
-    @Field()
-    password: string;
+  @Field()
+  lname: string;
 
-    @Field()
-    fname: string;
+  @Field({ nullable: true })
+  role?: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+}
 
-    @Field()
-    lname: string;
-  }
+@InputType()
+export class LoginInput {
+  @Field()
+  email: string;
+
+  @Field()
+  password: string;
+}
+
+@ObjectType()
+export class AuthResponse {
+  @Field()
+  token: string;
+
+  @Field(() => User)
+  user: User;
+}
