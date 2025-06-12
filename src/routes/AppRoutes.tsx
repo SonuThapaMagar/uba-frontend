@@ -6,12 +6,12 @@ import Dashboard from '../pages/dashboard/Dashboard';
 import CreateUser from '../pages/dashboard/CreateUser';
 import EditUser from '../pages/dashboard/EditUser';
 import DeleteUser from '../pages/dashboard/DeleteUser';
-import UsersList from '../pages/dashboard/UsersList';
+import UserList from '../pages/dashboard/UsersList';
 import SignupRequests from '../pages/dashboard/SignupRequests';
 import UserDetails from '../pages/dashboard/UserDetails';
 import Profile from '../pages/dashboard/Profile';
-import ProtectedRoute from '../components/ProtectedRoute';
 import EditProfile from '../pages/dashboard/EditProfile';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => {
   return (
@@ -30,14 +30,14 @@ const AppRoutes = () => {
         path="/users"
         element={
           <ProtectedRoute roles={['SUPER_ADMIN', 'ADMIN', 'USER']}>
-            <UsersList />
+            <UserList />
           </ProtectedRoute>
         }
       />
       <Route
         path="/users/createUser"
         element={
-          <ProtectedRoute roles={['SUPER_ADMIN']}>
+          <ProtectedRoute roles={['SUPER_ADMIN', 'ADMIN']}>
             <CreateUser />
           </ProtectedRoute>
         }
@@ -90,10 +90,8 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="/logout" element={<Login />} />
-      {/* Redirect root to login */}
+      <Route path="/logout" element={<Navigate to="/login" replace />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
-      {/* Catch all route - redirect to login */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
