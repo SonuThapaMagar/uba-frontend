@@ -42,6 +42,7 @@ export const GET_USER = gql`
     }
   }
 `;
+
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {
     currentUser {
@@ -54,6 +55,7 @@ export const GET_CURRENT_USER = gql`
     }
   }
 `;
+
 export const GET_USERS = gql`
   query GetUsers {
     users {
@@ -121,6 +123,19 @@ export const GET_SIGNUP_REQUESTS = gql`
       email
       fname
       lname
+      isVerified
+    }
+  }
+`;
+
+export const CREATE_USER = gql`
+  mutation CreateUser($input: SignupInput!) {
+    createUser(input: $input) {
+      id
+      email
+      fname
+      lname
+      role
       isVerified
     }
   }
