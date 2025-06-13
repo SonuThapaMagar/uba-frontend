@@ -5,7 +5,7 @@ import { AppDataSource } from '../config/database';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/constants';
-
+    
 @Resolver()
 export class UserResolver {
     @Authorized(['SUPER_ADMIN', 'ADMIN','USER'])
@@ -34,19 +34,23 @@ export class UserResolver {
     @Authorized(['SUPER_ADMIN'])
     @Mutation(() => User)
     async createUser(@Arg('input') input: SignupInput, @Ctx() { req }: any): Promise<User> {
-        const userRepository = AppDataSource.getRepository(User);
-        const existingUser = await userRepository.findOneBy({ email: input.email });
-        if (existingUser) throw new Error('Email already exists');
-        if (input.role === 'SUPER_ADMIN') throw new Error('Cannot create Super Admin');
-        const defaultPassword = 'Default123!';
-        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-        const user = userRepository.create({
-            ...input,
-            password: hashedPassword,
-            role: input.role || 'USER',
-            isVerified: true // Auto-verified for created users
-        });
-        return userRepository.save(user);
+    console.log('createUser input:', input);
+    const userRepository = AppDataSource.getRepository(User);
+    const existingUser = await userRepository.findOneBy({ email: input.email });
+    if (existingUser) throw new Error('Email already exists');
+    if (input.role === 'SUPER_ADMIN') throw new Error('Cannot create Super Admin');
+    if (!input.password) throw new Error('Password is required');
+    const hashedPassword = await bcrypt.hash(input.password, 10);
+    console.log('Hashed password:', hashedPassword);
+    const user = userRepository.create({
+        ...input,
+        password: hashedPassword,
+        role: input.role || 'USER',
+        isVerified: true
+    });
+    const savedUser = await userRepository.save(user);
+    console.log('Saved user:', savedUser);
+    return savedUser;
     }
 
     @Authorized(['SUPER_ADMIN'])

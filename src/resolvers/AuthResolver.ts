@@ -28,9 +28,11 @@ export class AuthResolver {
   async login(@Arg('input') input: LoginInput): Promise<AuthResponse> {
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOneBy({ email: input.email });
+    console.log('Found user:', user);
     if (!user) throw new Error('Invalid credentials');
     if (!user.isVerified) throw new Error('Account not verified');
     const valid = await bcrypt.compare(input.password, user.password);
+    console.log('Password valid:', valid);
     if (!valid) throw new Error('Invalid credentials');
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
     // Ensure user object includes role
