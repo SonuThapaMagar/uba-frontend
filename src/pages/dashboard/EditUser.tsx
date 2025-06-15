@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import DashboardLayout from '../../layouts/dashboardLayout';
 import InputField from '../../components/common/InputField';
 import { useForm } from '../../hooks/useForm';
 import { showToast } from '../../utils/toast';
@@ -102,102 +101,96 @@ const EditUser: React.FC = () => {
   };
 
   if (loading) return (
-    <DashboardLayout>
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-      </div>
-    </DashboardLayout>
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    </div>
   );
 
   if (queryError) return (
-    <DashboardLayout>
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <strong className="font-bold">Error: </strong>
-        <span className="block sm:inline">{queryError.message}</span>
-      </div>
-    </DashboardLayout>
+    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+      <strong className="font-bold">Error: </strong>
+      <span className="block sm:inline">{queryError.message}</span>
+    </div>
   );
 
   return (
-    <DashboardLayout>
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Edit User</h2>
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Edit User</h2>
+          <button
+            onClick={() => navigate('/users')}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            Cancel
+          </button>
+        </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <InputField
+            label="First Name"
+            type="text"
+            value={formData.fname}
+            onChange={handleInputChange}
+            placeholder="Enter first name"
+            required
+            name="fname"
+          />
+          <InputField
+            label="Last Name"
+            type="text"
+            value={formData.lname}
+            onChange={handleInputChange}
+            placeholder="Enter last name"
+            required
+            name="lname"
+          />
+          <InputField
+            label="Email"
+            type="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder="Enter email"
+            required
+            name="email"
+          />
+          {currentUserRole === 'SUPER_ADMIN' && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Role</label>
+              <select
+                name="role"
+                value={formData.role}
+                onChange={(e) => handleChange(e as any)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              >
+                <option value="USER">User</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+          )}
+          <div className="flex justify-end space-x-4">
             <button
+              type="button"
               onClick={() => navigate('/users')}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
             >
               Cancel
             </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Save Changes
+            </button>
           </div>
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-              <strong className="font-bold">Error: </strong>
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <InputField
-              label="First Name"
-              type="text"
-              value={formData.fname}
-              onChange={handleInputChange}
-              placeholder="Enter first name"
-              required
-              name="fname"
-            />
-            <InputField
-              label="Last Name"
-              type="text"
-              value={formData.lname}
-              onChange={handleInputChange}
-              placeholder="Enter last name"
-              required
-              name="lname"
-            />
-            <InputField
-              label="Email"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter email"
-              required
-              name="email"
-            />
-            {currentUserRole === 'SUPER_ADMIN' && (
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Role</label>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={(e) => handleChange(e as any)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                >
-                  <option value="USER">User</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
-              </div>
-            )}
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate('/users')}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
+        </form>
       </div>
-    </DashboardLayout>
+    </div>
   );
 };
 
