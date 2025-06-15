@@ -43,7 +43,7 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/users/editUser/:id"
+        path="/users/edit/:id"
         element={
           <ProtectedRoute roles={['SUPER_ADMIN', 'ADMIN']}>
             <EditUser />

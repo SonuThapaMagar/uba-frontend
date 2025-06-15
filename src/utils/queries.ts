@@ -1,5 +1,23 @@
 import { gql } from '@apollo/client';
 
+export interface User {
+  id: string;
+  fname: string;
+  lname: string;
+  email: string;
+  role: 'SUPER_ADMIN' | 'ADMIN' | 'USER';
+  isVerified: boolean;
+}
+
+export interface SignupInput {
+  fname: string;
+  lname: string;
+  email: string;
+  password?: string;
+  role?: 'ADMIN' | 'USER';
+}
+
+
 export const SIGNUP = gql`
   mutation Signup($input: SignupInput!) {
     signup(input: $input) {

@@ -32,4 +32,4 @@ export const useForm = (initialState: FormData = {}): UseFormReturn => {
     setFormData,
     resetForm
   };
-}; 
+};

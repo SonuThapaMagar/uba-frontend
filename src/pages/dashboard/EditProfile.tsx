@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../../layouts/dashboardLayout';
-import InputField from '../../components/common/InputField';
-import { useForm } from '../../hooks/useForm';
-import { showToast } from '../../utils/toast';
-import { TOAST_MESSAGES } from '../../constants/constant';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_CURRENT_USER, UPDATE_PROFILE } from '../../utils/queries';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../../layouts/dashboardLayout";
+import InputField from "../../components/common/InputField";
+import { useForm } from "../../hooks/useForm";
+import { showToast } from "../../utils/toast";
+import { TOAST_MESSAGES } from "../../constants/constant";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_CURRENT_USER, UPDATE_PROFILE } from "../../utils/queries";
 
 const EditProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -14,6 +14,7 @@ const EditProfile: React.FC = () => {
     fname: '',
     lname: '',
     email: '',
+    password: '',
   });
   const [error, setError] = useState('');
 
@@ -24,13 +25,14 @@ const EditProfile: React.FC = () => {
           fname: data.currentUser.fname,
           lname: data.currentUser.lname,
           email: data.currentUser.email,
+          password: '',
         });
       }
     },
     onError: (err) => {
       setError(err.message);
       showToast.error(TOAST_MESSAGES.USER_UPDATE_ERROR);
-    }
+    },
   });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE, {
@@ -41,12 +43,39 @@ const EditProfile: React.FC = () => {
     onError: (err) => {
       setError(err.message);
       showToast.error(TOAST_MESSAGES.USER_UPDATE_ERROR);
-    }
+    },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile({ variables: { input: formData } });
+    if (!formData.fname || !formData.lname || !formData.email || !formData.password) {
+      setError('All fields are required');
+      showToast.error('Please fill in all required fields');
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setError('Invalid email format');
+      showToast.error('Please enter a valid email');
+      return;
+    }
+    const input = {
+      fname: formData.fname.trim(),
+      lname: formData.lname.trim(),
+      email: formData.email.trim(),
+      password: formData.password.trim(),
+      role: undefined
+    };
+    try {
+      await updateProfile({ variables: { input } });
+    } catch (err) {
+      setError('Failed to update profile');
+      showToast.error(TOAST_MESSAGES.USER_UPDATE_ERROR);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(''); // Clear error when user starts typing
+    handleChange(e);
   };
 
   if (loading) return (
@@ -79,34 +108,48 @@ const EditProfile: React.FC = () => {
               Cancel
             </button>
           </div>
-          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+              <strong className="font-bold">Error: </strong>
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
-            <InputField 
-              label="First Name" 
-              type="text" 
-              value={formData.fname} 
-              onChange={handleChange} 
-              placeholder="Enter first name" 
-              required 
-              name="fname" 
+            <InputField
+              label="First Name"
+              type="text"
+              value={formData.fname}
+              onChange={handleInputChange}
+              placeholder="Enter first name"
+              required
+              name="fname"
             />
-            <InputField 
-              label="Last Name" 
-              type="text" 
-              value={formData.lname} 
-              onChange={handleChange} 
-              placeholder="Enter last name" 
-              required 
-              name="lname" 
+            <InputField
+              label="Last Name"
+              type="text"
+              value={formData.lname}
+              onChange={handleInputChange}
+              placeholder="Enter last name"
+              required
+              name="lname"
             />
-            <InputField 
-              label="Email" 
-              type="email" 
-              value={formData.email} 
-              onChange={handleChange} 
-              placeholder="Enter email" 
-              required 
-              name="email" 
+            <InputField
+              label="Email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Enter email"
+              required
+              name="email"
+            />
+            <InputField
+              label="Password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="Enter password"
+              required
+              name="password"
             />
             <div className="flex justify-end space-x-4">
               <button

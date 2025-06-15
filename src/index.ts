@@ -10,7 +10,7 @@ async function bootstrap() {
 
     const schema = await createSchema();
     console.log("Schema created");
-    const server = new ApolloServer({
+        const server = new ApolloServer({
       schema,
       cors: { origin: '*' },
       context: ({ req }) => ({ req }) // Optional, for auth later

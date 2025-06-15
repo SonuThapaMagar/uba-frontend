@@ -6,6 +6,7 @@ export const TOAST_MESSAGES = {
   // User Update
   USER_UPDATED: 'User updated successfully!',
   USER_UPDATE_ERROR: 'Failed to update user. Please try again.',
+  USER_FETCH_ERROR: 'Failed to fetch user details. Please try again.',
   EMAIL_EXISTS: 'Email already registered. Please use a different email.',
   
   // User Deletion
