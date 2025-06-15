@@ -6,8 +6,8 @@ export class SignupInput {
   @Field()
   email: string;
 
-  @Field({ nullable: true })
-  password?: string;
+  @Field()
+  password: string;
 
   @Field()
   fname: string;

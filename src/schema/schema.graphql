@@ -27,7 +27,6 @@ type Mutation {
 type Query {
   currentUser: User
   signupRequests: [User!]!
-  testPassword(email: String!, password: String!): Boolean!
   user(id: String!): User
   users: [User!]!
 }

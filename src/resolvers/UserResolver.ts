@@ -5,10 +5,10 @@ import { AppDataSource } from '../config/database';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/constants';
-    
+
 @Resolver()
 export class UserResolver {
-    @Authorized(['SUPER_ADMIN', 'ADMIN','USER'])
+    @Authorized(['SUPER_ADMIN', 'ADMIN', 'USER'])
     @Query(() => [User])
     async users(@Ctx() { req }: any): Promise<User[]> {
         return AppDataSource.getRepository(User).find();
@@ -16,9 +16,9 @@ export class UserResolver {
 
     @Query(() => User, { nullable: true })
     async currentUser(@Ctx() { currentUser }: any): Promise<User | null> {
-      return currentUser || null;
+        return currentUser || null;
     }
-    
+
     @Authorized(['SUPER_ADMIN', 'ADMIN'])
     @Query(() => User, { nullable: true })
     async user(@Arg('id') id: string): Promise<User | null> {
@@ -34,26 +34,26 @@ export class UserResolver {
     @Authorized(['SUPER_ADMIN'])
     @Mutation(() => User)
     async createUser(@Arg('input') input: SignupInput, @Ctx() { req }: any): Promise<User> {
-    console.log('createUser input:', input);
-    const userRepository = AppDataSource.getRepository(User);
-    const existingUser = await userRepository.findOneBy({ email: input.email });
-    if (existingUser) throw new Error('Email already exists');
-    if (input.role === 'SUPER_ADMIN') throw new Error('Cannot create Super Admin');
-    if (!input.password) throw new Error('Password is required');
-    const hashedPassword = await bcrypt.hash(input.password, 10);
-    console.log('Hashed password:', hashedPassword);
-    const user = userRepository.create({
-        ...input,
-        password: hashedPassword,
-        role: input.role || 'USER',
-        isVerified: true
-    });
-    const savedUser = await userRepository.save(user);
-    console.log('Saved user:', savedUser);
-    return savedUser;
+        console.log('createUser input:', input);
+        const userRepository = AppDataSource.getRepository(User);
+        const existingUser = await userRepository.findOneBy({ email: input.email });
+        if (existingUser) throw new Error('Email already exists');
+        if (input.role === 'SUPER_ADMIN') throw new Error('Cannot create Super Admin');
+        if (!input.password) throw new Error('Password is required');
+        const hashedPassword = await bcrypt.hash(input.password, 10);
+        console.log('Hashed password:', hashedPassword);
+        const user = userRepository.create({
+            ...input,
+            password: hashedPassword,
+            role: input.role || 'USER',
+            isVerified: true
+        });
+        const savedUser = await userRepository.save(user);
+        console.log('Saved user:', savedUser);
+        return savedUser;
     }
 
-    @Authorized(['SUPER_ADMIN'])
+    @Authorized(['SUPER_ADMIN', 'ADMIN'])
     @Mutation(() => User)
     async updateUser(@Arg('id') id: string, @Arg('input') input: SignupInput, @Ctx() { req }: any): Promise<User> {
         const userRepository = AppDataSource.getRepository(User);
@@ -109,10 +109,23 @@ export class UserResolver {
         const userRepository = AppDataSource.getRepository(User);
         const user = await userRepository.findOneBy({ id: userId });
         if (!user) throw new Error('User not found');
+
+        if (!input.fname || !input.lname || !input.email) {
+            throw new Error('First name, last name, and email are required');
+        }
+        if (!/\S+@\S+\.\S+/.test(input.email)) {
+            throw new Error('Invalid email format');
+        }
+        if (input.role && user.role !== 'SUPER_ADMIN') {
+            throw new Error('Cannot change role in profile update');
+        }
+
         user.email = input.email;
         user.fname = input.fname;
         user.lname = input.lname;
-        if (input.password) user.password = await bcrypt.hash(input.password, 10);
+        if (input.password) {
+            user.password = await bcrypt.hash(input.password, 10);
+        }
         return userRepository.save(user);
     }
 }
